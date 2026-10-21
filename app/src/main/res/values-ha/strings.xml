@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Scholarship Radar</string>
+    <string name="welcome_tagline">Nemi guraben karatu da tallafin bincike da aka tabbatar.</string>
+    <string name="phase0_note">Wannan gwaji ne na 0.1.0. Ana nan ana kara abubuwa.</string>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Scholarship Radar</string>
+    <string name="welcome_tagline">Find verified scholarships and research funding.</string>
+    <string name="phase0_note">Test build 0.1.0. Features are coming soon.</string>
+</resources>

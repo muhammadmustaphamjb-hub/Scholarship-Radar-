@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Private user data: only the owner.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      match /{sub=**} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Opportunities: anyone signed in can read; only admins can write from clients.
+    // Automated pipelines use the Admin SDK in Cloud Functions, which bypasses rules.
+    match /opportunities/{id} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+
+      match /evidence/{evidenceId} {
+        allow read: if signedIn();
+        allow write: if isAdmin();
+      }
+
+      match /verificationHistory/{eventId} {
+        allow read: if signedIn();
+        allow create: if isAdmin();
+        allow update, delete: if false; // append-only
+      }
+    }
+
+    // Backend-only collections: no client access, except admin read of the review queue.
+    match /reviewQueue/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    match /sources/{id} {
+      allow read, write: if false;
+    }
+
+    match /sourceRuns/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /admins/{uid} {
+      allow read, write: if false;
+    }
+
+    // Everything else is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
